@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # QR Code-Based Secure Key Exchange for Encrypted File Sharing with Biometric Eye-Scan Authentication
 
 An enterprise-grade, multi-factor zero-trust cryptographic file exchange system extending **AES-128-CBC** and **Blowfish-CBC** file encryption with:
@@ -138,3 +139,6 @@ Navigate to `http://127.0.0.1:5000/comparison` to execute the real-time comparat
 - **AES-128-CBC:** Demonstrates superior throughput (~200,000+ KB/s) utilizing hardware-accelerated AES-NI instructions.
 - **Blowfish-CBC:** Kept for quantitative comparison, exhibiting lower throughput (~45,000–60,000 KB/s) due to its 64-bit block size and lack of direct hardware pipeline support.
 
+=======
+# Crypo-capstone
+>>>>>>> 2d4e02ee36bd31130d929cbd6069ec30558c4039
