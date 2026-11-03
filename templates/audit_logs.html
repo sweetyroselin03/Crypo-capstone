@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Logs | Security Monitoring{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+    <div>
+        <h1>Security Audit Logs</h1>
+        <p>Immutable audit trail tracking state machine transitions, authentication attempts, lockouts, and biometric verification results. Secret keys and raw biometric images are strictly withheld from logs.</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2><i class="fa-solid fa-shield-halved"></i> Real-Time Audit Trail</h2>
+        <span class="badge badge-primary">Total Entries: {{ logs|length }}</span>
+    </div>
+    <div class="panel-body">
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Transfer ID</th>
+                        <th>Lifecycle Step</th>
+                        <th>Outcome Status</th>
+                        <th>Sanitized Audit Details</th>
+                        <th>Client IP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if logs %}
+                        {% for l in logs %}
+                        <tr>
+                            <td><small>{{ l.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small></td>
+                            <td><code>{{ l.transfer_id or '-' }}</code></td>
+                            <td><strong>{{ l.step }}</strong></td>
+                            <td>
+                                {% if l.status == 'SUCCESS' %}
+                                    <span class="badge badge-success"><i class="fa-solid fa-check"></i> SUCCESS</span>
+                                {% elif l.status == 'LOCKED' %}
+                                    <span class="badge badge-danger"><i class="fa-solid fa-lock"></i> LOCKED</span>
+                                {% elif l.status == 'OUT_OF_ORDER' %}
+                                    <span class="badge badge-danger"><i class="fa-solid fa-ban"></i> 403 BLOCKED</span>
+                                {% else %}
+                                    <span class="badge badge-warning"><i class="fa-solid fa-xmark"></i> FAILURE</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ l.details }}</td>
+                            <td><code>{{ l.ip_address }}</code></td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No audit entries found. System activity will be logged here.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

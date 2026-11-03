@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="hero-badge">
+        <i class="fa-solid fa-atom"></i> Quantum-Ready Cryptographic Architecture
+    </div>
+    <h1 class="hero-title">
+        QR Code-Based Secure Key Exchange with <span class="gradient-text">Biometric Eye-Scan</span>
+    </h1>
+    <p class="hero-subtitle">
+        A multi-layered Zero-Trust file sharing protocol combining PBKDF2 key wrapping, authenticated encryption (AES-128-CBC & Blowfish-CBC with HMAC-SHA256), active blink liveness verification, and periocular biometric authentication.
+    </p>
+
+    <div class="cta-actions">
+        <a href="/sender" class="btn btn-primary btn-large">
+            <i class="fa-solid fa-upload"></i> Sender: Encrypt & Share
+        </a>
+        <a href="/receiver" class="btn btn-secondary btn-large">
+            <i class="fa-solid fa-eye"></i> Receiver: Authenticate & Decrypt
+        </a>
+        <a href="/comparison" class="btn btn-outline btn-large">
+            <i class="fa-solid fa-bolt"></i> Benchmarks
+        </a>
+    </div>
+</div>
+
+<div class="architecture-grid">
+    <div class="card arch-card">
+        <div class="card-icon"><i class="fa-solid fa-key"></i></div>
+        <h3>Wrapped Key QR Exchange</h3>
+        <p>Raw cryptographic keys are never embedded in plain QR codes. Keys + IVs are wrapped with AES-256-GCM under a password-derived key (PBKDF2-HMAC-SHA256 with 200,000 iterations).</p>
+    </div>
+
+    <div class="card arch-card">
+        <div class="card-icon"><i class="fa-solid fa-eye"></i></div>
+        <h3>Biometric Eye-Scan Layer</h3>
+        <p>Webcam frames track facial and iris landmarks (MediaPipe Face Mesh). Normalizes eye crops, validates sharpness/lighting, and extracts 512D LBP + radial ring embeddings.</p>
+    </div>
+
+    <div class="card arch-card">
+        <div class="card-icon"><i class="fa-solid fa-shield-virus"></i></div>
+        <h3>Anti-Spoofing Liveness</h3>
+        <p>Real-time Eye Aspect Ratio (EAR) challenge-response requires genuine eye blinks, thwarting high-resolution photograph and video replay attacks.</p>
+    </div>
+
+    <div class="card arch-card">
+        <div class="card-icon"><i class="fa-solid fa-gears"></i></div>
+        <h3>Strict 6-Step State Machine</h3>
+        <p>Server-enforced session pipeline (QR_OK &rarr; PASSWORD_OK &rarr; KEY_SHOWN &rarr; EYE_ENROLLED &rarr; EYE_VERIFIED &rarr; DATA_VIEW). Unauthorized access attempts trigger HTTP 403.</p>
+    </div>
+</div>
+
+<!-- Workflow Stepper Flowchart -->
+<div class="workflow-card card">
+    <div class="card-header">
+        <h2><i class="fa-solid fa-route"></i> Receiver Authentication Lifecycle</h2>
+        <span class="badge badge-success">Zero-Trust Pipeline</span>
+    </div>
+    <div class="steps-flow">
+        <div class="flow-step">
+            <span class="step-num">1</span>
+            <div class="step-details">
+                <strong>QR Scan</strong>
+                <small>Webcam / upload</small>
+            </div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+            <span class="step-num">2</span>
+            <div class="step-details">
+                <strong>Password</strong>
+                <small>Salted unwrap</small>
+            </div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+            <span class="step-num">3</span>
+            <div class="step-details">
+                <strong>Secret Key</strong>
+                <small>30s auto-hide</small>
+            </div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+            <span class="step-num">4</span>
+            <div class="step-details">
+                <strong>Train Eyes</strong>
+                <small>20-frame template</small>
+            </div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+            <span class="step-num">5</span>
+            <div class="step-details">
+                <strong>Verify Eyes</strong>
+                <small>Liveness & match</small>
+            </div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+            <span class="step-num">6</span>
+            <div class="step-details">
+                <strong>View Data</strong>
+                <small>Decrypted Excel</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Performance Comparison | AES-128 vs Blowfish{% endblock %}
+
+{% block head %}
+<!-- Chart.js for comparative performance graphs -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-icon"><i class="fa-solid fa-chart-line"></i></div>
+    <div>
+        <h1>Performance Comparison: AES-128 vs Blowfish</h1>
+        <p>Quantitative cryptographic benchmarking evaluating encryption latency (ms) and throughput (KB/s) across varying file sizes.</p>
+    </div>
+</div>
+
+<div class="comparison-layout">
+    <!-- Live Benchmark Runner Card -->
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="fa-solid fa-bolt"></i> Real-Time Comparative Benchmark</h2>
+            <button type="button" class="btn btn-primary btn-sm" id="runBenchmarkBtn">
+                <i class="fa-solid fa-play"></i> Run Live Benchmark Suite
+            </button>
+        </div>
+        <div class="panel-body">
+            <p>Runs a multi-payload benchmark (10 KB to 1 MB) measuring raw cryptographic efficiency on your machine.</p>
+
+            <div class="charts-row">
+                <!-- Latency Chart -->
+                <div class="chart-wrapper">
+                    <h3>Encryption Latency (ms) - Lower is Better</h3>
+                    <canvas id="latencyChart"></canvas>
+                </div>
+
+                <!-- Throughput Chart -->
+                <div class="chart-wrapper">
+                    <h3>Throughput (KB/s) - Higher is Better</h3>
+                    <canvas id="throughputChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Benchmark Results Table -->
+            <div class="table-container" style="margin-top: 1.5rem;">
+                <table class="data-table" id="benchmarkTable">
+                    <thead>
+                        <tr>
+                            <th>Payload Size</th>
+                            <th>AES-128 Latency (ms)</th>
+                            <th>Blowfish Latency (ms)</th>
+                            <th>AES-128 Throughput (KB/s)</th>
+                            <th>Blowfish Throughput (KB/s)</th>
+                            <th>Winner</th>
+                        </tr>
+                    </thead>
+                    <tbody id="benchmarkTableBody">
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">Click "Run Live Benchmark Suite" to execute tests.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historical Transfers Table -->
+    <div class="card" style="margin-top: 2rem;">
+        <div class="card-header">
+            <h2><i class="fa-solid fa-clock-rotate-left"></i> Historical Transfer Benchmarks</h2>
+            <span class="badge badge-info">Recent Transfers</span>
+        </div>
+        <div class="panel-body">
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Transfer ID</th>
+                            <th>File Name</th>
+                            <th>Size (KB)</th>
+                            <th>Cipher Used</th>
+                            <th>Encryption Time</th>
+                            <th>Throughput</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if transfers %}
+                            {% for t in transfers %}
+                            <tr>
+                                <td><code>{{ t.id }}</code></td>
+                                <td><strong>{{ t.original_filename }}</strong></td>
+                                <td>{{ "%.2f"|format(t.file_size_bytes / 1024.0) }} KB</td>
+                                <td>
+                                    <span class="badge {% if t.cipher_type == 'AES' %}badge-success{% else %}badge-warning{% endif %}">
+                                        {{ t.cipher_type }}
+                                    </span>
+                                </td>
+                                <td>{{ "%.2f"|format(t.enc_time_ms) }} ms</td>
+                                <td>{{ "%.1f"|format(t.throughput_kb_s) }} KB/s</td>
+                                <td>{{ t.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">No files encrypted yet. Go to <a href="/sender">Sender Portal</a> to encrypt a contract.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/comparison.js') }}"></script>
+{% endblock %}
+

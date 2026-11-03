@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}QR Crypto & Biometric Eye-Scan Key Exchange{% endblock %}</title>
+    <!-- Modern typography & icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="brand-logo">
+                <i class="fa-solid fa-shield-halved brand-icon"></i>
+                <div class="brand-text">
+                    <span class="brand-title">CRYPTO-CP</span>
+                    <span class="brand-sub">Biometric & QR Key Exchange</span>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="/sender" class="nav-item {% if request.path == '/sender' %}active{% endif %}">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Sender Portal
+                </a>
+                <a href="/receiver" class="nav-item {% if request.path == '/receiver' %}active{% endif %}">
+                    <i class="fa-solid fa-eye"></i> Receiver Portal
+                </a>
+                <a href="/comparison" class="nav-item {% if request.path == '/comparison' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-line"></i> Performance
+                </a>
+                <a href="/admin/audit-logs" class="nav-item {% if request.path == '/admin/audit-logs' %}active{% endif %}">
+                    <i class="fa-solid fa-clipboard-list"></i> Audit Logs
+                </a>
+            </div>
+            <div class="security-badge">
+                <i class="fa-solid fa-lock"></i>
+                <span>AES-128 / Blowfish</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="main-wrapper">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p><strong>Capstone Project:</strong> QR Code-Based Secure Key Exchange for Encrypted File Sharing with Biometric Eye-Scan Layer</p>
+            <p class="footer-note">Webcam capture utilizes periocular/iris landmarks & LBP ring embeddings. Confidential templates encrypted at rest via AES-GCM.</p>
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
+

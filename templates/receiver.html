@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block title %}Receiver Portal | 6-Step Multi-Factor Authentication{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-icon"><i class="fa-solid fa-eye-shield"></i></div>
+    <div>
+        <h1>Receiver Authentication Portal</h1>
+        <p>Strict Zero-Trust 6-Step Verification: Enforces server-side state progression before secret key revelation, biometric template matching, and file decryption.</p>
+    </div>
+</div>
+
+<!-- Stepper Navigation Bar -->
+<div class="stepper-nav card">
+    <div class="step-item active" id="stepIndicator1" data-step="1">
+        <div class="step-circle"><i class="fa-solid fa-qrcode"></i></div>
+        <div class="step-label">1. QR Scan</div>
+    </div>
+    <div class="step-line"></div>
+
+    <div class="step-item" id="stepIndicator2" data-step="2">
+        <div class="step-circle"><i class="fa-solid fa-key"></i></div>
+        <div class="step-label">2. Password</div>
+    </div>
+    <div class="step-line"></div>
+
+    <div class="step-item" id="stepIndicator3" data-step="3">
+        <div class="step-circle"><i class="fa-solid fa-eye"></i></div>
+        <div class="step-label">3. Secret Key</div>
+    </div>
+    <div class="step-line"></div>
+
+    <div class="step-item" id="stepIndicator4" data-step="4">
+        <div class="step-circle"><i class="fa-solid fa-user-gear"></i></div>
+        <div class="step-label">4. Eye Train</div>
+    </div>
+    <div class="step-line"></div>
+
+    <div class="step-item" id="stepIndicator5" data-step="5">
+        <div class="step-circle"><i class="fa-solid fa-id-badge"></i></div>
+        <div class="step-label">5. Eye Verify</div>
+    </div>
+    <div class="step-line"></div>
+
+    <div class="step-item" id="stepIndicator6" data-step="6">
+        <div class="step-circle"><i class="fa-solid fa-table"></i></div>
+        <div class="step-label">6. View Data</div>
+    </div>
+</div>
+
+<!-- Live Alert Banner -->
+<div id="alertBanner" class="alert-box" style="display: none;"></div>
+
+<!-- Step Content Cards -->
+<div class="step-panels">
+
+    <!-- ============================================== -->
+    <!-- STEP 1: QR Scan -->
+    <!-- ============================================== -->
+    <div class="card step-panel" id="panelStep1">
+        <div class="card-header">
+            <h2><i class="fa-solid fa-qrcode"></i> Step 1: Scan Wrapped Key QR Code</h2>
+            <span class="badge badge-primary">State: INITIAL</span>
+        </div>
+        <div class="panel-body">
+            <p>Scan the sender's encrypted QR code using your webcam or upload a saved QR image.</p>
+
+            <div class="qr-scan-options">
+                <!-- Webcam Scanner Box -->
+                <div class="scanner-subcard">
+                    <h3><i class="fa-solid fa-camera"></i> Live Webcam Scanner</h3>
+                    <div class="webcam-viewport">
+                        <video id="qrVideo" playsinline autoplay muted class="camera-stream"></video>
+                        <canvas id="qrCanvas" style="display: none;"></canvas>
+                        <div class="scanner-overlay"><div class="scan-target-box"></div></div>
+                    </div>
+                    <div class="camera-controls">
+                        <button type="button" class="btn btn-outline btn-sm" id="startQrCameraBtn">
+                            <i class="fa-solid fa-video"></i> Start Webcam
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm" id="stopQrCameraBtn" style="display:none;">
+                            <i class="fa-solid fa-video-slash"></i> Stop Webcam
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Image File Upload / Quick Paste -->
+                <div class="scanner-subcard">
+                    <h3><i class="fa-solid fa-file-image"></i> Upload QR Image</h3>
+                    <div class="file-drop-area" id="qrDropArea">
+                        <i class="fa-solid fa-image drop-icon"></i>
+                        <p id="qrDropText">Drop QR code image here, or <span class="highlight">browse</span></p>
+                        <input type="file" id="qrFileInput" accept="image/*" class="file-input">
+                    </div>
+
+                    <div class="manual-input-box">
+                        <label for="qrRawText"><small>Or Paste Wrapped QR Payload Token:</small></label>
+                        <textarea id="qrRawText" rows="2" class="form-control code-text" placeholder="eyJ2IjogMiwgInRpZCI..."></textarea>
+                        <button type="button" class="btn btn-secondary btn-sm" id="submitQrTokenBtn">
+                            <i class="fa-solid fa-check"></i> Submit Token
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- STEP 2: Password Challenge -->
+    <!-- ============================================== -->
+    <div class="card step-panel" id="panelStep2" style="display: none;">
+        <div class="card-header">
+            <h2><i class="fa-solid fa-lock"></i> Step 2: Transfer Passphrase Verification</h2>
+            <span class="badge badge-warning">State: QR_OK</span>
+        </div>
+        <div class="panel-body">
+            <p>Enter the secret password set by the sender for Transfer ID: <strong id="step2TransferId" class="text-primary"></strong></p>
+            <div class="security-notice">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Protected by PBKDF2 (200k iterations) and AES-256-GCM. 5 failed attempts trigger a 15-minute transfer lockout.</span>
+            </div>
+
+            <form id="passwordForm" class="narrow-form">
+                <div class="form-group">
+                    <label for="receiverPassword">Enter Password:</label>
+                    <div class="input-with-icon">
+                        <input type="password" id="receiverPassword" class="form-control" required placeholder="Enter sender passphrase">
+                        <button type="button" class="btn-eye-toggle" id="toggleRecvPwdBtn"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                </div>
+                <div class="attempts-indicator" id="attemptsLeftLabel">Attempts remaining: 5</div>
+                <button type="submit" class="btn btn-primary btn-block" id="verifyPasswordBtn">
+                    <i class="fa-solid fa-unlock-keyhole"></i> Verify & Unwrap Key
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- STEP 3: Secret Key Reveal -->
+    <!-- ============================================== -->
+    <div class="card step-panel" id="panelStep3" style="display: none;">
+        <div class="card-header">
+            <h2><i class="fa-solid fa-key"></i> Step 3: Secret Cryptographic Key Reveal</h2>
+            <span class="badge badge-info">State: PASSWORD_OK</span>
+        </div>
+        <div class="panel-body">
+            <p>The unwrap operation was successful. The secret key and IV are revealed below in masked form for security.</p>
+            
+            <div class="timer-box">
+                <i class="fa-solid fa-stopwatch"></i> Auto-Hides in <strong id="countdownTimer">30</strong>s
+                <div class="countdown-bar-container">
+                    <div class="countdown-bar" id="countdownBar"></div>
+                </div>
+            </div>
+
+            <div class="keys-display-card">
+                <div class="key-field">
+                    <span class="key-label">Cipher:</span>
+                    <span class="key-value badge badge-success" id="keyCipher">AES-128-CBC</span>
+                </div>
+                <div class="key-field">
+                    <span class="key-label">Secret Key:</span>
+                    <span class="key-value masked-code" id="keyVal">••••••••••••••••••••••••••••••••</span>
+                </div>
+                <div class="key-field">
+                    <span class="key-label">Initialization Vector (IV):</span>
+                    <span class="key-value masked-code" id="ivVal">••••••••••••••••••••••••••••••••</span>
+                </div>
+                <div class="key-actions">
+                    <button type="button" class="btn btn-sm btn-outline" id="revealKeyBtn">
+                        <i class="fa-solid fa-eye"></i> Reveal Key
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline" id="copyKeyBtn">
+                        <i class="fa-solid fa-copy"></i> Copy Key Hex
+                    </button>
+                </div>
+            </div>
+
+            <div class="security-notice info-notice">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Strict Security Guarantee: This secret key is held only in ephemeral memory and is <strong>never written to logs</strong>.</span>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-block" id="proceedToEnrollBtn">
+                <i class="fa-solid fa-arrow-right"></i> Proceed to Step 4: Eye Scan Enrollment
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- STEP 4: Eye Scan Enrollment ("Train Mode") -->
+    <!-- ============================================== -->
+    <div class="card step-panel" id="panelStep4" style="display: none;">
+        <div class="card-header">
+            <h2><i class="fa-solid fa-user-gear"></i> Step 4: Biometric Eye Scan Enrollment (Train Mode)</h2>
+            <span class="badge badge-warning">State: KEY_SHOWN</span>
+        </div>
+        <div class="panel-body">
+            <p>Look directly into the camera. The system will capture <strong>15–20 high-quality frames</strong>, detect iris and eye landmarks, and synthesize a secure biometric template for this receiver session.</p>
+
+            <div class="biometric-viewport-container">
+                <div class="camera-card">
+                    <video id="enrollVideo" playsinline autoplay muted class="camera-stream"></video>
+                    <canvas id="enrollCanvas" style="display: none;"></canvas>
+                    <div class="eye-tracker-guides">
+                        <div class="eye-box left-eye-box"><small>Left Eye</small></div>
+                        <div class="eye-box right-eye-box"><small>Right Eye</small></div>
+                    </div>
+                </div>
+
+                <div class="enrollment-stats-card">
+                    <h3>Enrollment Progress</h3>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="enrollProgressBar" style="width: 0%;">0%</div>
+                    </div>
+                    <div class="progress-label" id="enrollProgressLabel">Captured 0 / 20 quality frames</div>
+
+                    <div class="feedback-card" id="enrollFeedback">
+                        <i class="fa-solid fa-circle-info"></i> Position your eyes within the guides and hold steady.
+                    </div>
+
+                    <div class="quality-badges">
+                        <span class="badge badge-outline" id="sharpnessBadge"><i class="fa-solid fa-magnifying-glass"></i> Sharpness: OK</span>
+                        <span class="badge badge-outline" id="lightingBadge"><i class="fa-solid fa-sun"></i> Lighting: OK</span>
+                    </div>
+
+                    <div class="enroll-actions">
+                        <button type="button" class="btn btn-primary btn-block" id="startEnrollCaptureBtn">
+                            <i class="fa-solid fa-camera"></i> Start Eye Scan Capture
+                        </button>
+                        <button type="button" class="btn btn-outline btn-block" id="reEnrollBtn">
+                            <i class="fa-solid fa-arrows-rotate"></i> Re-Enroll / Reset Buffer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- STEP 5: Eye Scan Verification & Liveness -->
+    <!-- ============================================== -->
+    <div class="card step-panel" id="panelStep5" style="display: none;">
+        <div class="card-header">
+            <h2><i class="fa-solid fa-id-badge"></i> Step 5: Live Biometric Eye Verification</h2>
+            <span class="badge badge-warning">State: EYE_ENROLLED</span>
+        </div>
+        <div class="panel-body">
+            <p>Verify your live biometric identity. An active <strong>blink challenge</strong> is required to thwart photo and replay attacks. You have <strong>3 attempts</strong> before a 15-minute security lockout.</p>
+
+            <div class="biometric-viewport-container">
+                <div class="camera-card">
+                    <video id="verifyVideo" playsinline autoplay muted class="camera-stream"></video>
+                    <canvas id="verifyCanvas" style="display: none;"></canvas>
+                    <div class="liveness-indicator" id="livenessPrompt">
+                        <i class="fa-solid fa-eye-slash"></i> Please blink naturally to confirm liveness...
+                    </div>
+                </div>
+
+                <div class="verification-stats-card">
+                    <h3>Live Match Verification</h3>
+                    <div class="match-meter-box">
+                        <div class="meter-label">
+                            <span>Cosine Similarity:</span>
+                            <strong id="simScoreLabel">0.00%</strong>
+                        </div>
+                        <div class="meter-bar-container">
+                            <div class="meter-bar" id="simMeterBar" style="width: 0%;"></div>
+                        </div>
+                        <small>Threshold: &ge; 90.0% similarity required for access</small>
+                    </div>
+
+                    <div class="attempts-indicator" id="eyeAttemptsLabel">Verification Attempts Left: 3</div>
+
+                    <div class="feedback-card" id="verifyFeedback">
+                        <i class="fa-solid fa-shield"></i> Look into the camera and blink when prompted.
+                    </div>
+
+                    <button type="button" class="btn btn-success btn-block btn-large" id="startVerifyBtn">
+                        <i class="fa-solid fa-fingerprint"></i> Start Live Eye Verification
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- STEP 6: View Data & Excel Download -->
+    <!-- ============================================== -->
+    <div class="card step-panel" id="panelStep6" style="display: none;">
+        <div class="card-header">
+            <h2><i class="fa-solid fa-table"></i> Step 6: Decrypted Confidential Spreadsheet</h2>
+            <span class="badge badge-success">State: DATA_VIEW</span>
+        </div>
+        <div class="panel-body">
+            <div class="data-view-header">
+                <div>
+                    <h3 id="decFileName">Confidential_Contract.xlsx</h3>
+                    <small>Decryption completed in <strong id="decTimeLabel" class="text-success">0.00 ms</strong></small>
+                </div>
+                <a id="downloadDecryptedBtn" href="" class="btn btn-success">
+                    <i class="fa-solid fa-file-excel"></i> Download Decrypted Excel (.xlsx)
+                </a>
+            </div>
+
+            <!-- Spreadsheet Table Container -->
+            <div class="table-container">
+                <table class="data-table" id="decryptedTable">
+                    <thead id="tableHead"></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/receiver.js') }}"></script>
+{% endblock %}
+

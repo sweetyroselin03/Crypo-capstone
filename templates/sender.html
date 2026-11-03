@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Sender Portal | Encrypt & Generate QR{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+    <div>
+        <h1>Sender Portal</h1>
+        <p>Encrypt confidential Excel contracts using AES-128 or Blowfish, wrap cryptographic keys under a password, and generate the secure key exchange QR code.</p>
+    </div>
+</div>
+
+<div class="sender-layout">
+    <!-- Form Card -->
+    <div class="card sender-card">
+        <div class="card-header">
+            <h2><i class="fa-solid fa-file-shield"></i> File Encryption & Key Wrap</h2>
+            <span class="badge badge-info">Input Validation: .xlsx Only</span>
+        </div>
+
+        <form id="senderForm" enctype="multipart/form-data">
+            <!-- File Upload -->
+            <div class="form-group">
+                <label for="excelFile"><i class="fa-solid fa-file-excel"></i> Select Excel File (.xlsx):</label>
+                <div class="file-drop-area" id="dropArea">
+                    <i class="fa-solid fa-file-arrow-up drop-icon"></i>
+                    <p class="drop-text" id="fileLabel">Drag & drop your Excel contract here, or <span class="highlight">browse</span></p>
+                    <input type="file" id="excelFile" name="file" accept=".xlsx" required class="file-input">
+                </div>
+                <div class="sample-loader">
+                    <span>Quick Test:</span>
+                    <button type="button" class="btn btn-sm btn-outline" id="loadSampleBtn">
+                        <i class="fa-solid fa-magic"></i> Load Sample Legal Contract.xlsx
+                    </button>
+                </div>
+            </div>
+
+            <!-- Cipher Selection -->
+            <div class="form-group">
+                <label><i class="fa-solid fa-microchip"></i> Encryption Cipher:</label>
+                <div class="cipher-selector">
+                    <label class="radio-card selected" id="labelAes">
+                        <input type="radio" name="cipher_type" value="AES" checked>
+                        <div class="radio-content">
+                            <span class="radio-title"><i class="fa-solid fa-shield"></i> AES-128-CBC</span>
+                            <span class="radio-desc">16-byte key + 16-byte IV + HMAC-SHA256 (NIST Standard)</span>
+                        </div>
+                    </label>
+
+                    <label class="radio-card" id="labelBf">
+                        <input type="radio" name="cipher_type" value="BLOWFISH">
+                        <div class="radio-content">
+                            <span class="radio-title"><i class="fa-solid fa-lock"></i> Blowfish-CBC</span>
+                            <span class="radio-desc">8-byte key + 8-byte IV + HMAC-SHA256 (Comparative Cipher)</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Transfer Password -->
+            <div class="form-group">
+                <label for="transferPassword"><i class="fa-solid fa-key"></i> Transfer Passphrase:</label>
+                <div class="input-with-icon">
+                    <input type="password" id="transferPassword" name="password" placeholder="Set a secure password for this transfer (min 6 chars)" required minlength="6" class="form-control">
+                    <button type="button" class="btn-eye-toggle" id="togglePwdBtn"><i class="fa-solid fa-eye"></i></button>
+                </div>
+                <small class="form-help">Keys are wrapped using AES-256-GCM under PBKDF2 (200k iterations). The QR code is useless without this password.</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-large" id="encryptBtn">
+                <i class="fa-solid fa-lock"></i> Encrypt File & Generate Wrapped QR
+            </button>
+        </form>
+    </div>
+
+    <!-- Results Card (Hidden until submitted) -->
+    <div class="card result-card" id="resultCard" style="display: none;">
+        <div class="card-header">
+            <h2><i class="fa-solid fa-qrcode"></i> Secure Key Exchange Package</h2>
+            <span class="badge badge-success" id="cipherBadge">AES-128-CBC</span>
+        </div>
+
+        <div class="result-body">
+            <!-- QR Code Display -->
+            <div class="qr-preview-box">
+                <img id="qrImage" src="" alt="Secure Key Exchange QR Code" class="qr-img">
+                <div class="qr-meta">
+                    <p class="qr-tid">Transfer ID: <strong id="resTransferId"></strong></p>
+                    <a id="downloadQrLink" href="" download="" class="btn btn-sm btn-outline">
+                        <i class="fa-solid fa-download"></i> Download QR Image
+                    </a>
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <span class="metric-label">File Size</span>
+                    <span class="metric-val" id="resSize">-- KB</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-label">Encryption Time</span>
+                    <span class="metric-val text-primary" id="resTime">-- ms</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-label">Throughput</span>
+                    <span class="metric-val text-success" id="resThroughput">-- KB/s</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a id="downloadEncLink" href="" class="btn btn-secondary btn-block">
+                    <i class="fa-solid fa-download"></i> Download Encrypted File (.enc)
+                </a>
+                <button type="button" class="btn btn-primary btn-block" id="proceedReceiverBtn">
+                    <i class="fa-solid fa-arrow-right"></i> Proceed to Receiver Flow
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/sender.js') }}"></script>
+{% endblock %}
+
