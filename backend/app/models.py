@@ -10,6 +10,9 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
 
 class Transfer(db.Model):
     __tablename__ = "transfers"
@@ -28,6 +31,9 @@ class Transfer(db.Model):
     sessions = db.relationship("ReceiverSession", backref="transfer", cascade="all, delete-orphan")
     audit_logs = db.relationship("AuditLog", backref="transfer", cascade="all, delete-orphan")
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
 
 class ReceiverSession(db.Model):
     __tablename__ = "receiver_sessions"
@@ -45,6 +51,9 @@ class ReceiverSession(db.Model):
     # Temporary cached revealed key (masked/encrypted in memory/session, valid only during KEY_SHOWN for 30s)
     key_revealed_at = db.Column(db.DateTime, nullable=True)
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
 
 class BiometricTemplate(db.Model):
     __tablename__ = "biometric_templates"
@@ -54,6 +63,9 @@ class BiometricTemplate(db.Model):
     encrypted_template = db.Column(db.Text, nullable=False)  # Encrypted/hashed feature vector JSON
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class AuditLog(db.Model):
@@ -65,6 +77,9 @@ class AuditLog(db.Model):
     event_timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False, index=True)
     success = db.Column(db.Boolean, default=True, nullable=False)
     sanitized_metadata = db.Column(db.Text, nullable=True)  # JSON formatted sanitized logs (NO secrets)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def to_dict(self):
         meta = {}
@@ -93,6 +108,9 @@ class Benchmark(db.Model):
     decryption_time_ms = db.Column(db.Float, nullable=False)
     throughput_kbps = db.Column(db.Float, nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def to_dict(self):
         return {
