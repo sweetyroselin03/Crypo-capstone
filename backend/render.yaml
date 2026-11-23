@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: crypto-capstone-api
+    env: python
+    region: oregon
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_DEBUG
+        value: "0"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: STORAGE_TYPE
+        value: local
+      - key: STORAGE_DIR
+        value: /opt/render/project/src/storage
+      - key: EYE_SIMILARITY_THRESHOLD
+        value: "0.90"
+      - key: BLINK_EAR_CLOSE_THRESHOLD
+        value: "0.17"
+      - key: BLINK_EAR_OPEN_THRESHOLD
+        value: "0.22"
+      - key: MAX_PASSWORD_ATTEMPTS
+        value: "5"
+      - key: MAX_EYE_ATTEMPTS
+        value: "3"
+      - key: LOCKOUT_DURATION_MINUTES
+        value: "15"
+      - key: SESSION_EXPIRY_MINUTES
+        value: "60"
+      - key: KEY_REVEAL_TIMEOUT_SECONDS
+        value: "30"

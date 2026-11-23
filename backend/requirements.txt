@@ -1,0 +1,13 @@
+Flask==3.1.0
+Flask-Cors==6.0.0
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.36
+pycryptodome==3.21.0
+cryptography==44.0.0
+openpyxl==3.1.5
+opencv-python-headless==4.10.0.84
+numpy==2.2.0
+qrcode==8.0
+Pillow==11.0.0
+gunicorn==23.0.0
+pytest==8.3.4
