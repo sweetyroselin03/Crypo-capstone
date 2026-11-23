@@ -1,0 +1,16 @@
+[tool.pyright]
+include = ["backend"]
+extraPaths = [
+    "backend",
+    "backend/app",
+    "C:/Users/trasr/AppData/Roaming/Python/Python313/site-packages",
+    "C:/Program Files/Python313/Lib/site-packages"
+]
+
+[tool.pyrefly]
+search-path = [
+    "backend",
+    "backend/app",
+    "C:/Users/trasr/AppData/Roaming/Python/Python313/site-packages",
+    "C:/Program Files/Python313/Lib/site-packages"
+]

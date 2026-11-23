@@ -119,7 +119,7 @@ def create_transfer():
     qr_img = qr.make_image(fill_color="#0F172A", back_color="#FFFFFF")
 
     buffer = io.BytesIO()
-    qr_img.save(buffer, format="PNG")
+    qr_img.save(buffer)
     qr_png_bytes = buffer.getvalue()
     qr_data_url = f"data:image/png;base64,{base64.b64encode(qr_png_bytes).decode('utf-8')}"
 
@@ -180,7 +180,7 @@ def download_qr(transfer_id):
     qr_img = qr.make_image(fill_color="#0F172A", back_color="#FFFFFF")
 
     buffer = io.BytesIO()
-    qr_img.save(buffer, format="PNG")
+    qr_img.save(buffer)
     buffer.seek(0)
 
     return send_file(
